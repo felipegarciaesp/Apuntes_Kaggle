@@ -8,5 +8,5 @@ Una neurona (o unidad) con un solo input se ve como la siguiente imagen:
 
 ![Una sola neurona](https://github.com/felipegarciaesp/Apuntes_Kaggle/blob/main/Imagen_1.jpg)
 
-
+El input es 'x', su conexión con la neurona tiene un **peso** que es 'w'
 
