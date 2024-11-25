@@ -17,3 +17,16 @@ Las neuronas pueden tener múltiples inputs, como se muestra en la siguiente ima
 ![Multiples inputs](https://github.com/felipegarciaesp/Apuntes_Kaggle/blob/main/Iimagen_2.jpg)
 
 La fórmula para esta neurona sería: $$y = w_0 x_0 + w_1 x_1 + w_2 x_2 + b$$
+
+La manera más fácil de crear un modelo en Keras es por medio de keras.Sequential, que crea una red neuronal como un conjunto de capas. La sintaxis es la siguiente:
+
+```
+from tensorflow import keras
+from tensorflow.keras import layers
+
+# Create a network with 1 linear unit
+model = keras.Sequential([
+    layers.Dense(units=1, input_shape=[3])
+])
+```
+
