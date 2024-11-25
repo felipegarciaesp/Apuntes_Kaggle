@@ -16,3 +16,4 @@ Las neuronas pueden tener múltiples inputs, como se muestra en la siguiente ima
 
 ![Multiples inputs](https://github.com/felipegarciaesp/Apuntes_Kaggle/blob/main/Iimagen_2.jpg)
 
+La fórmula para esta neurona sería: $$y = w_0 x_0 + w_1 x_1 + w_2 x_2 + b$$
