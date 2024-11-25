@@ -30,3 +30,8 @@ model = keras.Sequential([
 ])
 ```
 
+Con units definimos cuántos outputs queremos, en el caso del ejemplo tenemos sólo 1 output.
+Con input_shape le decimos a Keras las dimensiones del input. Seteando input_shape = [3] nos aseguramos que el modelo aceptará 3 inputs.
+
+>Why is input_shape a Python list?
+>The data we'll use in this course will be tabular data, like in a Pandas dataframe. We'll have one input for each feature in the dataset. The >features are arranged by column, so we'll always have input_shape=[num_columns]. The reason Keras uses a list here is to permit use of more >complex datasets. Image data, for instance, might need three dimensions: [height, width, channels]
