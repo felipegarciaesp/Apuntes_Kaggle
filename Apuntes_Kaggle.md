@@ -111,8 +111,49 @@ Para entrenar una red neuronal, ademas de tener datos de entrenamiento necesitar
 
 ### The Loss Function (Función de pérdida)
 
-Durante el entrenamiento, el modelo usará la función de pérdida como una guía para encontrar los valores correctos de sus pesos (menor pérdida es mejor). En otras palabras, la unción de pérdida le dice a la red cuál es su objetivo.
+Durante el entrenamiento, el modelo usará la función de pérdida como una guía para encontrar los valores correctos de sus pesos (menor pérdida es mejor). En otras palabras, la función de pérdida le dice a la red cuál es su objetivo.
 
-Diferentes problemas requerirán diferentes funciones de pérdida. Una función de pérdida común para problemas de regresión 
+Diferentes problemas requerirán diferentes funciones de pérdida. Una función de pérdida común para problemas de regresión es el **error absoluto medio** ó **MAE**. También se encuentran el **error cuadrático medio** (**MSE**) y el **Huber loss**, entre otros.
 
-(ACÁ QUEDÉ! 26/11)
+### El optimizador - Stochastic Gradient Descent, SGD (Gradiente Descendiente Estocástico).
+
+El trabajo del optimizador es decirle a la red como resolver el problema. El optimizador es un algoritmo que ajusta los pesos para minimizar la pérdida. 
+
+Virtualmente, todos los algoritmos utilizados en deep learning pertenecen a una familia llamada **"gradiente descendiente estocástico"**, que son algoritmos iterativos que entrenan a una red en pasos. Un paso de entrenamiento consiste en lo siguiente:
+
+1. Selecciona algunos datos de entrenamiento y los córre en la red para hacer algunas predicciones.
+2. Mide la pérdida entre las predicciones y los valores verdaderos.
+3. Finalmente, ajusta los pesos de manera que haga la pérdida más pequeña.
+
+Luego, se repiten estos pasos hasta que la pérdida es tan pequeña como sea requerido (o hasta que no pueda decrecer más).
+
+La muestra de cada iteración se denomina **minibatch** (o simplemente **batch**), mientras que una ronda completa de los datos de entrenamiento se denomina **epoch**. El número de epochs que entrenas será la cantidad de veces que la red verá cada ejemplo de entrenamiento.
+
+>NOTA IMPORTANTE:
+> - Cuando se entrena una red neuronal, no solo cambian los pesos sino que también el sesgo (bias). Explicado con una regresión lineal, al entrenar la red cambian tanto la pendiente como el intercepto.
+
+### Tasa de aprendizaje y tamaño del batch (Learning Rate and Batch Size)
+
+La tasa de aprendizaje (learning rate) determina el tamaño de los pasos que da el algoritmo para ajustar los pesos de la red durante el proceso de aprendizaje. Un learning rate más pequeño significa que la red necesitará ver más minibatches para que sus pesos convergan a los mejores valores.
+
+> Imagina que estás en una colina tratando de llegar al punto más bajo (mínimo de la función de error). Un learning rate grande sería como dar saltos largos: puedes llegar rápido pero podrías pasarte del mínimo. Un learning rate pequeño es como dar pasos cortos: tardarás más, pero es menos probable que te pases del mínimo.
+
+El learning rate y el tamaño de los minibatches son **los dos parámetros que tienen un mayor efecto en como procede el entrenamiento del SGD**. La elección de valores para estos parámetros no siempre es obvia.
+
+**Adam** es un algoritmo SGD que tiene un learning rate adaptativo que lo hace apto para la mayoría de problemas sin requerir ningún ajuste de parámetros (es "auto-ajustable", en cierto sentido). 
+
+> Adam es un gran optimizador de propósito general.
+
+Luego de definir un modelo, puedes añadir una loss function y un optimizer con el método ´compile´:
+
+```
+model.compile(
+    optimizer="adam",
+    loss="mae",
+)
+```
+
+>What's In a Name?
+>The gradient is a vector that tells us in what direction the weights need to go. More precisely, it tells us how to change the weights to make the loss change fastest. We call our process gradient descent because it uses the gradient to descend the loss curve towards a minimum. Stochastic means "determined by chance." Our training is stochastic because the minibatches are random samples from the dataset. And that's why it's called SGD!
+
+Acá quedé, continuar con EXAMPLE - RED WINE QUALITY.
