@@ -43,3 +43,5 @@ Los problemas de **regresion** son problemas de ajuste de curvas, en donde inten
 ## 2 Deep Neural Networks
 
 Las redes neuronales tipicamente organizan sus neuronas en **capas** (**layers** en inglés). Cuando juntamos varias neuronas que tienen un set de inputs en común, tenemos una **capa densa** (**dense layer**).
+
+![Capa densa con dos neuronas](https://github.com/felipegarciaesp/Apuntes_Kaggle/blob/main/Imagen%203.jpg)
