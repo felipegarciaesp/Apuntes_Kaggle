@@ -69,3 +69,50 @@ Las capas antes de la capa de salida son denominadas como **ocultas** (**hidden*
 ![Creando la red neuronal](https://github.com/felipegarciaesp/Apuntes_Kaggle/blob/main/Imagen_6.jpg)
 
 Fijarse que en la imagen se muestra que la capa final (output) es una unidad lineal (es decir, sin función de activación). Esto hace que esta red sea apropiada para tareas de **regresión**, **donde tratamos de predecir un valor numérico arbitrario**. Otras tareas (como **clasificación**) podrían requerir de una función de activación en el output.
+
+El modelo Sequential utilizado conectará un listado de capas en orden desde el primero hasta el último: la primera capa recibe el/los input(s), y la ultima capa produce el output. El sigueinte código crea el modelo que se muestra en la figura de arriba:
+
+```
+from tensorflow import keras
+from tensorflow.keras import layers
+
+model = keras.Sequential([
+    # the hidden ReLU layers
+    layers.Dense(units=4, activation='relu', input_shape=[2]),
+    layers.Dense(units=3, activation='relu'),
+    # the linear output layer 
+    layers.Dense(units=1),
+])
+```
+
+La de arriba es la forma usual de definir una función de activación para una capa. Sin embargo, hay situaciones en que se va a requerir la otra forma, correspondiente a la siguiente:
+
+```
+layers.Dense(units=8),
+layers.Activation('relu')
+```
+
+Lo anterior es completamente equivalente a ´layers.Dense(units=8, activation='relu')´.
+
+Asegúrate de pasar todas las capas juntas en una lista, como [layer, layer, layer, ...], en vez de argumentos por separado.
+
+Hay una gran familia de variantes de la activación 'relu' ('elu', 'selu' y 'swish', por nombrar algunas). Algunas podrían desempeñarse mejor que otras, por lo que habría que experimentar cual se adapta mejor en cada caso. La activación ReLU tiende a ser buena en la mayoría de los problemas, por lo que es un buen punto de partida.
+
+## 3 Stochastic Gradient Descent
+
+En esta sección se verá como entrenar una red neuronal, se verá como las redes neuronales aprenden.
+
+Entrenar la red significa ajustar sus pesos de manera tal que pueda transformar, para un set de datos de entrenamiento, los features (inputs) en los target (outputs).
+
+Para entrenar una red neuronal, ademas de tener datos de entrenamiento necesitaremos dos cosas:
+
+- Una **"loss function"** que mida que tan buenas son las predicciones de la red.
+- Un **"optimizer"** que le pueda decir a la red como cambiar sus pesos.
+
+### The Loss Function (Función de pérdida)
+
+Durante el entrenamiento, el modelo usará la función de pérdida como una guía para encontrar los valores correctos de sus pesos (menor pérdida es mejor). En otras palabras, la unción de pérdida le dice a la red cuál es su objetivo.
+
+Diferentes problemas requerirán diferentes funciones de pérdida. Una función de pérdida común para problemas de regresión 
+
+(ACÁ QUEDÉ! 26/11)
