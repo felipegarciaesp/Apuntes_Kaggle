@@ -45,3 +45,27 @@ Los problemas de **regresion** son problemas de ajuste de curvas, en donde inten
 Las redes neuronales tipicamente organizan sus neuronas en **capas** (**layers** en inglés). Cuando juntamos varias neuronas que tienen un set de inputs en común, tenemos una **capa densa** (**dense layer**).
 
 ![Capa densa con dos neuronas](https://github.com/felipegarciaesp/Apuntes_Kaggle/blob/main/Imagen%203.jpg)
+
+Se puede pensar en que cada capa de una red neuronal está desempeñando alguna clase de transformación simple. A través de una pila profunda de capas, una red neuronal puede transformar sus inputs de maneras cada vez más complejas.
+
+### La función de activación (The Activation Function)
+
+Dos capas densas con nada entremedio no son mejores que una sola capa densa por sí sola. Las capas densas por sí mismas no podrán movernos nunca del mundo de líneas y planos. Lo que necesitamos es algo *no lineal*, es decir, **funciones de activación**.
+
+![Funcion de activacion](https://github.com/felipegarciaesp/Apuntes_Kaggle/blob/main/Imagen_4.jpg)
+
+Sin funciones de activación, las redes neuronales solo podrían aprender relaciones lineales. Para ajustar curvas, necesitamos funciones de activación.
+
+Una **función de activación** es simplemente una función que se aplican a las salidas de las capas. La más común es la **rectifier function max(0, x)**:
+
+![The rectifier function](https://github.com/felipegarciaesp/Apuntes_Kaggle/blob/main/Imagen_5.jpg)
+
+Cuando aplicamos la funcion rectifier a una unidad lineal, obtendremos una **rectified linear unit** ó **ReLU** (es más común identificar esta función como **función ReLU**). Aplicar una activación ReLU a una unidad lineal significa que como output obtendremos: $$max(0, w*x + b)$$.
+
+### Apilando capas densas
+
+Las capas antes de la capa de salida son denominadas como **ocultas** (**hidden**), ya que nunca vemos sus outputs directamente.
+
+![Creando la red neuronal](https://github.com/felipegarciaesp/Apuntes_Kaggle/blob/main/Imagen_6.jpg)
+
+Fijarse que en la imagen se muestra que la capa final (output) es una unidad lineal (es decir, sin función de activación). Esto hace que esta red sea apropiada para tareas de **regresión**, **donde tratamos de predecir un valor numérico arbitrario**. Otras tareas (como **clasificación**) podrían requerir de una función de activación en el output.
