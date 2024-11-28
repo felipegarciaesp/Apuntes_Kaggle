@@ -156,4 +156,30 @@ model.compile(
 >What's In a Name?
 >The gradient is a vector that tells us in what direction the weights need to go. More precisely, it tells us how to change the weights to make the loss change fastest. We call our process gradient descent because it uses the gradient to descend the loss curve towards a minimum. Stochastic means "determined by chance." Our training is stochastic because the minibatches are random samples from the dataset. And that's why it's called SGD!
 
-Acá quedé, continuar con EXAMPLE - RED WINE QUALITY.
+>Decidir la arquitectura de tu modelo deberia ser parte de un proceso (determinar cuantas neuronas y capas ocultas utilizar, asi como las funciones de activaciona utilizar). Empieza simple y ocupa la val_loss como tu guía (al momento de ejecutar model.fit(), Keras te va a informar respecto al val_loss mientras entrena el modelo)
+
+Los pasos para armar una red neuronal serían los siguientes:
+
+1. Definir la arquitectura de la red con keras.Sequential.
+2. Luego, se compila el optimizador y la funcion de perdida con model.compile()
+3. Ocupamos model.fit() para ingresar la data de entrenamiento y validación, ademas de definir el batch_size (cuántas lineas del df de entrenamiento queremos que Keras le alimente al optimizador cada vez) y los epochs (cuantas veces le estamos pidiendo que haga lo anterior).
+
+El método .fit guarda un registro de la pérdida durante el entrenamiento. Esto se ve en la siguiente figura:
+
+![Funcion de perdida](https://github.com/felipegarciaesp/Apuntes_Kaggle/blob/main/Imagen_7.jpg)
+
+En la figura, la funcion de perdida va disminuyendo en la medida que aumentan los epochs. Cuando la curva se vuelve tan horizontal como en la figura, significa que el modelo ha aprendido todo lo que puede y que no hay necesidad de continuar con epochs adicionales.
+
+>Si la curva de pérdida se ha nivelado, no obtendremos ninguna ventaja al entrenar el modelo con epochs adicionales. Al contrario, si la pérdida pareciera estar aún en decrecimiento, entonces entrenar el modelo con epochs adicionales podría ser ventajoso.
+
+Con el learning rate y el batch size tenemos control sobre:
+- Cuánto tiempo nos toma entrenar un modelo.
+- Cuán ruidosas son las curvas de aprendizaje.
+- Cuán pequeña se vuelve la pérdida.
+
+Los batch de tamaños cada vez más pequeños resultarán en actualizaciones de pesos y curvas de pérdida más ruidosas. Esto es porque cada batch es una pequeña muestra de data y muestras más pequeñas tienden a dar estimaciones más ruidosas. Sin embargo, batch_sizes mas pequeños pueden tener un efecto "promediado" que puede ser beneficioso. **TAREA: Dar una vuelta a esta explicación, estudiala más**
+
+Las tasas de aprendizaje mas pequeñas hacen que las actualizaciones sean más pequeñas y el entrenamiento toma más tiempo para converger. Tasas de aprendizaje mas grandes pueden acelerar el entrenamiento, pero no se "asientan" muy bien al mínimo. Cuando la tasa de aprendizaje es muy grande, el entrenamiento puede fallar completamente (Una tasa de aprendizaje grande puede ser 0.99, por ejemplo).
+
+## 4 Overfitting and Underfitting
+
