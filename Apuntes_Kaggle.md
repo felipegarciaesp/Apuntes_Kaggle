@@ -183,3 +183,76 @@ Las tasas de aprendizaje mas pequeñas hacen que las actualizaciones sean más p
 
 ## 4 Overfitting and Underfitting
 
+En este capitulo se va a aprender a interpretar las curvas de pérdidas (tanto de entrenamiento como de validación) y com ocuparlas para el desarrollo del modelo. En particular, se buscarán en estas curvas evidencias de overfitting y underfitting; y el uso de estrategias para resolverlas.
+
+La información de la data de entrenamiento puede ser de dos tipos: señal y ruido. La señal es la parte que generaliza, la que puede ayudar a nuestro modelo a hacer predicciones desde data nueva. El ruido es esa parte que solo es verdadera para la data de entrenamiento y que no ayuda al modelo a hacer predicciones. El ruido es esa parte que parece útil pero realmente no lo es.
+
+Para entrenar un modelo de deep learning de forma efectiva, necesitamos interpretar bien las curvas de aprendizaje (learning curves):
+
+![Curvas de Aprendizaje](https://github.com/felipegarciaesp/Apuntes_Kaggle/blob/main/Imagen_8.jpg)
+
+El training loss va a ir bajando ya sea que el modelo aprenda de señales o aprenda de ruido. Pero el validation loss irá hacia abajo sólo cuando el modelo aprenda de señales. Es decir, si el modelo aprende del ruido del set de entrenamiento, no generalizará bien a nueva data.
+
+En resumen, si un modelo aprende de señales, tanto el loss training como el validation loss irán disminuyendo. Pero cuando el model aprende a partir de ruido, se formará un gap entre ambas curvas. La magnitud de este gap nos dirá cuánto ruido a aprendido el modelo.
+
+Se habla de **underfitting** y **overfitting** del set de entrenamiento. La clave de entrenar modelos de deep learning es encontrar el balance perfecto entre ambos.
+
+**Underfitting** es cuando la pérdida no es tan baja como podría ser porque el modelo no ha aprendido mucho de la señal.
+**Overfitting** es cuando la pérdida no es tan baja como podría ser porque el modelo ha aprendido mucho ruido.
+
+### Capacidad
+
+La capacidad de un modelo se refiere al **tamaño y complejidad de los patrones que es capaz de aprender**. Para el caso de una red neuronal, la capacidad va a estar determinada por la cantidad de neuronas que tiene y como están conectadas entre sí.
+Si pareciera que tu red está cometiendo **underfitting**, deberías incrementar su **capacidad**.
+
+La capacidad de una red se pueden incrementar haciéndola **más ancha (mas unidades para capas existentes)** o haciéndola **más profunda (añadiendo más capas).**
+
+Redes más anchas lo tienen más fácil para aprender de relaciones lineales, mientras es preferible ocupar redes más profundas para relaciones no lineales. La elección de cuál es mejor dependerá solamente del conjunto de datos.
+
+```
+model = keras.Sequential([
+    layers.Dense(16, activation='relu'),
+    layers.Dense(1),
+])
+
+wider = keras.Sequential([
+    layers.Dense(32, activation='relu'),
+    layers.Dense(1),
+])
+
+deeper = keras.Sequential([
+    layers.Dense(16, activation='relu'),
+    layers.Dense(16, activation='relu'),
+    layers.Dense(1),
+])
+```
+
+### Early stopping (detención temprana)
+
+Una forma de evitar que un modelo siga aprendiendo del ruido es simplemente deteniendo su aprendizaje en el momento en que la validation loss no parezca estar descendiendo más. Interrumpir el entrenamiento de esta manera es llamada **detención temprana (early stopping)**.
+
+![Early Stopping](https://github.com/felipegarciaesp/Apuntes_Kaggle/blob/main/Imagen_9.jpg)
+
+Una vez que dtectamos que la validation loss está empezando a aumentar, podemos resetear los pesos al valor donde ocurrió el mínimo de la validation loss. Esto asegura que el modelo no continuará aprendiendo del ruido y que se producza overfitting.
+
+Ocupar la detención temprana también nos sirve para no detener el modelo antes de que aprenda de la suficiente cantidad de señal. Este metodo ademas de prevenir el overfitting puede tambien prevenir el underfitting, por no haber entrenado por la suficiente cantidad de tiempo. **Elige una cantidad de epochs lo suficientemente grande, incluso más de lo necesario, y el early stopping se hará cargo del resto.**
+
+### Adición de Early Stopping
+
+En Keras incluimos un early stopping en el entrenamiento por medio de un **callback**. Estoes una función que quieres que corra mientras la red se entrena. Esta va a correr luego de cada epoch. El código sería el siguiente:
+
+```
+from tensorflow.keras.callbacks import EarlyStopping
+
+early_stopping = EarlyStopping(
+    min_delta=0.001, # minimium amount of change to count as an improvement
+    patience=20, # how many epochs to wait before stopping
+    restore_best_weights=True,
+)
+```
+
+El código anterior dice lo siguiente:
+
+>Si no ha habido una mejora de por lo menos 0.001 en la validation loss en las 20 epochs anteriores, entonces detén el entrenamiento y mantén el mejor modelo encontrado.
+
+**Algunas veces puede ser dificil decir si la validation loss está aumentando debido al overfitting o sólo debido a las variaciones aleatorias de batch.**
