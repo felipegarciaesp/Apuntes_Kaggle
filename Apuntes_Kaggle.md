@@ -193,12 +193,22 @@ Para entrenar un modelo de deep learning de forma efectiva, necesitamos interpre
 
 El training loss va a ir bajando ya sea que el modelo aprenda de señales o aprenda de ruido. Pero el validation loss irá hacia abajo sólo cuando el modelo aprenda de señales. Es decir, si el modelo aprende del ruido del set de entrenamiento, no generalizará bien a nueva data.
 
-En resumen, si un modelo aprende de señales, tanto el loss training como el validation loss irán disminuyendo. Pero cuando el model aprende a partir de ruido, se formará un gap entre ambas curvas. La magnitud de este gap nos dirá cuánto ruido a aprendido el modelo.
+En resumen, si un modelo aprende de señales, tanto el loss training como el validation loss irán disminuyendo. Pero cuando el modelo aprende a partir de ruido, se formará un gap entre ambas curvas. La magnitud de este gap nos dirá cuánto ruido a aprendido el modelo.
 
 Se habla de **underfitting** y **overfitting** del set de entrenamiento. La clave de entrenar modelos de deep learning es encontrar el balance perfecto entre ambos.
 
 **Underfitting** es cuando la pérdida no es tan baja como podría ser porque el modelo no ha aprendido mucho de la señal.
 **Overfitting** es cuando la pérdida no es tan baja como podría ser porque el modelo ha aprendido mucho ruido.
+
+Por ejemplo, veamos el siguiente gráfico que resulta del **Exercise: Overfitting and Underfitting** (link: https://www.kaggle.com/code/fgarciaesp/exercise-overfitting-and-underfitting/edit)
+
+![loss y val_loss](https://github.com/felipegarciaesp/Apuntes_Kaggle/blob/main/Imagen_10.jpg)
+
+**Pregunta:** ¿El modelo está cometiendo underfitting, overfitting, o está ok?
+**Respuesta:** El gap entre las curvas es bastante pequeño y la validation loss nunca incrementa, por lo que es más probable que la red esté cometiendo underfitting antes que overfitting. De todas formas, valdría la pena experimentar con mayor capacidad si ese es el caso.
+
+>TAREA:
+>Revisa graficos que ejemplifiquen casos de overfitting y de underfitting. Entrena tu ojo para reconocer cada caso y el porqué.
 
 ### Capacidad
 
@@ -256,3 +266,35 @@ El código anterior dice lo siguiente:
 >Si no ha habido una mejora de por lo menos 0.001 en la validation loss en las 20 epochs anteriores, entonces detén el entrenamiento y mantén el mejor modelo encontrado.
 
 **Algunas veces puede ser dificil decir si la validation loss está aumentando debido al overfitting o sólo debido a las variaciones aleatorias de batch.**
+
+El siguiente gráfico resulta de **Exercise: Overfitting and Underfitting** (link: https://www.kaggle.com/code/fgarciaesp/exercise-overfitting-and-underfitting/edit).
+Este es un caso de overfitting: la validation loss empieza a subir muy pronto, mientras la training loss continúa su decrecimiento. En este punto, necesitaremos intentar algo para prevenirlo, **ya sea reduciendo el número de unidades o por medio de un método como early stopping**.
+
+
+![Ejemplo de Overfitting](https://github.com/felipegarciaesp/Apuntes_Kaggle/blob/main/Imagen_11.jpg)
+
+
+
+A continuación, un breve recordatorio del orden de la sintaxis para definir y entrenar una red neuronal con Keras:
+
+```
+#1ero, se crea la red con la cantidad de unidades y capas requeridas:
+model = keras.Sequential([
+    layers.Dense(1, input_shape=input_shape),
+])
+
+#2do, se definen la loss function y el optimizer:
+model.compile(
+    optimizer='adam',
+    loss='mae',
+)
+
+#3ero, se entrena el modelo con .fit y se definen las epochs y batch_size:
+history = model.fit(
+    X_train, y_train,
+    validation_data=(X_valid, y_valid),
+    batch_size=512,
+    epochs=50,
+    verbose=0, # suppress output since we'll plot the curves
+)
+```
