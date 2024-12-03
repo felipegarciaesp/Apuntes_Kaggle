@@ -204,7 +204,8 @@ Por ejemplo, veamos el siguiente gráfico que resulta del **Exercise: Overfittin
 
 ![loss y val_loss](https://github.com/felipegarciaesp/Apuntes_Kaggle/blob/main/Imagen_10.jpg)
 
-**Pregunta:** ¿El modelo está cometiendo underfitting, overfitting, o está ok?
+**Pregunta:** ¿El modelo está cometiendo underfitting, overfitting, o está ok?  
+
 **Respuesta:** El gap entre las curvas es bastante pequeño y la validation loss nunca incrementa, por lo que es más probable que la red esté cometiendo underfitting antes que overfitting. De todas formas, valdría la pena experimentar con mayor capacidad si ese es el caso.
 
 >TAREA:
@@ -261,6 +262,19 @@ early_stopping = EarlyStopping(
 )
 ```
 
+Otra forma de utilizar EarlyStopping es la siguiente:
+
+```
+from tensorflow.keras import callbacks
+
+early_stopping = callbacks.EarlyStopping(
+    patience=5,
+    min_delta=0.001,
+    restore_best_weights=True,
+)
+```
+
+
 El código anterior dice lo siguiente:
 
 >Si no ha habido una mejora de por lo menos 0.001 en la validation loss en las 20 epochs anteriores, entonces detén el entrenamiento y mantén el mejor modelo encontrado.
@@ -270,10 +284,7 @@ El código anterior dice lo siguiente:
 El siguiente gráfico resulta de **Exercise: Overfitting and Underfitting** (link: https://www.kaggle.com/code/fgarciaesp/exercise-overfitting-and-underfitting/edit).
 Este es un caso de overfitting: la validation loss empieza a subir muy pronto, mientras la training loss continúa su decrecimiento. En este punto, necesitaremos intentar algo para prevenirlo, **ya sea reduciendo el número de unidades o por medio de un método como early stopping**.
 
-
 ![Ejemplo de Overfitting](https://github.com/felipegarciaesp/Apuntes_Kaggle/blob/main/Imagen_11.jpg)
-
-
 
 A continuación, un breve recordatorio del orden de la sintaxis para definir y entrenar una red neuronal con Keras:
 
@@ -289,12 +300,26 @@ model.compile(
     loss='mae',
 )
 
+#2.1: Antes de entrenar el modelo, se define el early stopping (solo si se requiere utilizar):
+from tensorflow.keras import callbacks
+from tensorflow.keras.callbacks import EarlyStopping
+
+early_stopping = EarlyStopping(
+    min_delta=0.001,
+    patience=5,
+    restore_best_weights=True
+)
+
 #3ero, se entrena el modelo con .fit y se definen las epochs y batch_size:
 history = model.fit(
     X_train, y_train,
     validation_data=(X_valid, y_valid),
     batch_size=512,
     epochs=50,
-    verbose=0, # suppress output since we'll plot the curves
+    verbose=0, # verbose = 0 silencia la animacion que nos uestra el progreso de las epochs.
+    callbacks=[early_stopping] #se agrega de esta forma el early stopping, en caso de haberlo definido.
 )
 ```
+
+## 5 Dropout and Batch Normalization
+
