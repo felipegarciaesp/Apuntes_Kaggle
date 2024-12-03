@@ -323,3 +323,4 @@ history = model.fit(
 
 ## 5 Dropout and Batch Normalization
 
+Aca quedé (3/12), retomar desde aca.
