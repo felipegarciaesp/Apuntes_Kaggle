@@ -153,6 +153,16 @@ model.compile(
 )
 ```
 
+También existe el optimizador **SGD**, que es mas sensible a diferencias en la escala. Un ejemplo de aplicación es cuando no tienes data de entrada normalizada. Un ejemplo a continuacion:
+
+```
+model.compile(
+    optimizer="sgd",
+    loss="mae",
+)
+```
+
+
 >What's In a Name?
 >The gradient is a vector that tells us in what direction the weights need to go. More precisely, it tells us how to change the weights to make the loss change fastest. We call our process gradient descent because it uses the gradient to descend the loss curve towards a minimum. Stochastic means "determined by chance." Our training is stochastic because the minibatches are random samples from the dataset. And that's why it's called SGD!
 
@@ -207,6 +217,9 @@ Por ejemplo, veamos el siguiente gráfico que resulta del **Exercise: Overfittin
 **Pregunta:** ¿El modelo está cometiendo underfitting, overfitting, o está ok?  
 
 **Respuesta:** El gap entre las curvas es bastante pequeño y la validation loss nunca incrementa, por lo que es más probable que la red esté cometiendo underfitting antes que overfitting. De todas formas, valdría la pena experimentar con mayor capacidad si ese es el caso.
+
+>NOTAS IMPORTANTES:
+>El overfitting se produce cuando la red aprende de patrones espurios de la data de entrenamiento.
 
 >TAREA:
 >Revisa graficos que ejemplifiquen casos de overfitting y de underfitting. Entrena tu ojo para reconocer cada caso y el porqué.
@@ -323,4 +336,138 @@ history = model.fit(
 
 ## 5 Dropout and Batch Normalization
 
-Aca quedé (3/12), retomar desde aca.
+Hay muchisimos tipos de capas que se pueden añadir a un modelo, no solo capas densas.
+
+Se van a ver dos tipos de capas especiales que no contienen neuronas, pero que añaden algunas funcionalidades que puede beneficiar al modelo: **Dropout** y **Batch Normalization**.
+
+### Dropout
+
+La capa dropout puede ayudar a corregir el **overfitting**.
+
+El overfitting se produce cuando la red aprende de patrones espurios en la data de entrenamiento. Para reconocer estos patrones espurios una red a menudo necesita confiar en una combinación especifica de pesos, un tipo de "conspiración" de pesos. Al ser tan especificos, tienden a ser frágiles: remueve uno y la conspiración se cae.
+
+La idea de **dropout** es la de romper esta conspiración. Para lograr esto, aleatoriamente se desprenden (drop out) algunas fracciones de los inputs de las capas en cada paso de entrenamiento, haciendo mucho más dificil para la red que aprenda de estos patrones espurios en la data de entrenamiento. En cambio, va a tener que buscar patrones más amplios y generales, cuyos pesos tienden a ser más robustos.
+
+Otra forma de explicar el dropout es como una forma de crear un conjunto de redes. Las predicciones ya no se van a hacer por una gran red, sino que por un comité de pequeñas redes. Los individuos en el comité tienden a tener distintos tipos de errores, pero también a estar en lo correcto. Esto hace que el comité en su conjunto lo haga mejor que a nivel individual.
+
+>En simple, con dropout se van apagando aleatoriamente algunas neuronas de una capa con el objetivo de corregir el overfitting.
+
+#### Añadiendo Dropout
+
+En Keras, el argumento **rate** define el porcentaje de las neuronas que se quieren apagar. Es importante señalar que en términos de código, la **capa dropout** se aplica a la salida de la capa densa anterior. En el siguiente código se muestra un ejemplo:
+
+```
+keras.Sequential([
+    # ...
+    layers.Dropout(rate=0.3), # se apaga el 30% de las salidas de la capa que viene antes de esta línea.
+    layers.Dense(16), #por lo tanto, esta capa recibe la salida de la capa anterior con el 30% de sus valores apagados.
+    # ...
+])
+```
+
+>Cuando colocas una capa de Dropout en tu modelo de Keras, lo que realmente estás haciendo es especificar que deseas apagar un cierto porcentaje de las salidas de la capa anterior antes de pasarlas a la capa siguiente. Estás aplicando dropout a la salida de la capa anterior antes de alimentar esa salida a la capa siguiente.
+
+En el siguiente códgio, por ejemplo, se aplica un dropout para apagar el 30% de las salidas de la primera capa con 128 neuronas, y luego se aplica un segundo dropout para apagar el 30% de las salidas de la segunda capa con 64 neuronas:
+
+```
+model = keras.Sequential([
+    layers.Dense(128, activation='relu', input_shape=input_shape),
+    layers.Dropout(0.3),
+    layers.Dense(64, activation='relu'),
+    layers.Dropout(0.3),
+    layers.Dense(1)
+])
+```
+
+### Batch Normalization
+
+Batch Normalization (batchnorm) significa normalización por lotes. **Esto puede corregir el entrenamiento que es lento o inestable.**
+
+Pero primero, ¿porqué se requiere normalizar?   
+- SGD tiende a cambiar los pesos de la red en proporción al tamaño de activación que producen los datos. Las caracteristicas que tienden a producir activaciones de tamaños muy diferentes pueden generar un comportamiento de entrenamiento inestable.
+- Por lo tanto, es buena práctica normalizar la data antes de utilizarla en nuestra red.
+
+>Se puede normalizar la data con StandardScaler o MinMaxScaler de scikit-learn.  
+
+>Si es bueno normalizar la data antes que entre en la red, quizás normalizar también dentro de la red puede ser mejor.
+
+Lo que hace batchnorm es **normalizar la data dentro de la red** y para eso tenemos un tipo de capa especial que puede hacer esto: **batch normalization layer**. Esta capa toma cada batch que entra y primero normaliza el batch con su propio promedio y desviación estándar, y luego re-escala la data con dos parámetros de re-escalado entrenables. Batchnorm realiza un tipo de re-escalado coordinado de sus inputs.
+
+
+>La capa batchnorm se añade como ayuda al proceso de optimización, auqnue a veces también puede ayudar al rendimiento de la predicción.  
+
+>Los modelos con batchnorm tienden a tener menos epochs para completar el entrenamiento.  
+
+>El batchnorm también puede solucionar varios problemas que causan el estancamiento del entrenamiento. Considera añadir la batch normalization a los modelos, especialmente si tienes problemas durante el entrenamiento.  
+
+>Al añadir dropout puede que necesites incrementar el número de unidades en tus Dense layers.  
+
+>Normalmente, tendrás mejor desempñeo del modelo si estandarizas la data antes de usarla para el entrenamiento.
+
+#### Añadiendo Batch Normalization
+
+Esta capa se puede usar en casi cualquier punto en la red. La puedes poner despues de la capa...
+
+```
+layers.Dense(16, activation='relu'),
+layers.BatchNormalization(),
+```
+
+...o se puede colocar entre una capa y su función de activación:
+
+```
+layers.Dense(16),
+layers.BatchNormalization(),
+layers.Activation('relu'),
+```
+
+Si se añade como la primera capa de la red puede desempeñarse como algo del estilo del StandardScaler de Sci-Kit Learn.
+
+El siguiente es un ejemplo de código donde se ocupa batchnorm al inicio y en varias capas:
+
+```
+model = keras.Sequential([
+    layers.BatchNormalization(input_shape=input_shape),
+    layers.Dense(512, activation='relu'),
+    layers.BatchNormalization(),
+    layers.Dense(512, activation='relu'),
+    layers.BatchNormalization(),
+    layers.Dense(512, activation='relu'),
+    layers.BatchNormalization(),
+    layers.Dense(1),
+])
+```
+Notar que el input shape se coloca en la capa batchnorm de al principio y no en la primera capa densa.
+
+>NOTA IMPORTANTE:
+>Debido a la configuración de una cierta red para resolver un problema de un dataset en particular, te podría pasar que tu modelo no converga a ninguna solución (si graficas la loss y val loss, te aparecerá en blanco). El **batchnorm** puede ayudar a corregir problemas de este tipo.
+>El batchnorm puede permitirme entrenar modelos en datasets más complicados.
+
+#### Ejemplo de codigo con dropout y batchnorm
+
+En el siguiente codigo se muestra un ejemplo de aplciación de dropout y batchnorm:
+
+```
+from tensorflow import keras
+from tensorflow.keras import layers
+
+model = keras.Sequential([
+    layers.Dense(1024, activation='relu', input_shape=[11]),
+    layers.Dropout(0.3),
+    layers.BatchNormalization(),
+    layers.Dense(1024, activation='relu'),
+    layers.Dropout(0.3),
+    layers.BatchNormalization(),
+    layers.Dense(1024, activation='relu'),
+    layers.Dropout(0.3),
+    layers.BatchNormalization(),
+    layers.Dense(1),
+])
+```
+
+No hay cambios en como se setea el entrenamiento (optimizer, loss y .fit()).
+
+El siguiente gráfico muestra como se comportan la pérdida de entrenamiento y validación al aplicar dropout y batchnorm. El gráfico ocupa el mismo dataset que se ocupa en el **Exercise: Overfitting and Underfitting**, por lo que se recomienda comparar con los otros gráficos expuestos.
+
+![dropout y batchnorm](https://github.com/felipegarciaesp/Apuntes_Kaggle/blob/main/Imagen_12.jpg)
+
